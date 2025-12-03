@@ -56,7 +56,7 @@ CIFS File Shares
      ChromaDB Collection
           enterprise_collections
 ``` 
-This encsures all documentation is searchable and query-ready.
+This ensures all documentation is searchable and query-ready.
 
 ---
 
@@ -118,6 +118,9 @@ All retrieval and inference operations occur internally.
 ---
 
 # Security & Isolation
-    * Fully on-prem; no external APIs
-    * CIFS mounts set to read-only from Windows file server
-    * Docker network isolation prevents cross-container exposure
+
+Fully on-prem; no external APIs
+
+CIFS mounts set to read-only from Windows file server
+
+Docker network isolation prevents cross-container exposure
