@@ -2,6 +2,14 @@
 
 This repository contains a self-hosted AI Knowledge Platform built around **Retrieval-Augmented Generation (RAG)**.
 
+---
+
+## 📐 Architecture Diagram
+
+<p align="center">
+  <img src="docs/screenshots/architecture.png" width="700"/>
+</p>
+
 The goal of this project is to provide a secure, internal-only AI assistant that can answer questions using an organization’s own knowledge base (SOPs, policies, internal docs) without sending data to external APIs.
 
 ---
