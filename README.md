@@ -104,5 +104,7 @@ See docs/architecture-overview.md for diagrams and more detail.
 
 	• Docker & Docker Compose
 	• (Optional) NVIDIA GPU drivers + CUDA for GPU acceleration with Ollama
-2. Clone the repo
 
+2. Clone the repo
+git clone https://github.com/<your-username>/ai-platform-poc.git
+cd ai-platform-poc
