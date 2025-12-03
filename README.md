@@ -94,17 +94,37 @@ Upload or mount internal documents → index them into a vector database → que
 │   ├── rag-api/
 │   └── kb-indexer/
 ├── kb-samples/
-└── scripts
-
+└── scripts/
+```
 See docs/architecture-overview.md for diagrams and more detail.
 
- Getting Started
+---
+
+🚀 Getting Started
 
 1. Prerequisites
-
-	• Docker & Docker Compose
-	• (Optional) NVIDIA GPU drivers + CUDA for GPU acceleration with Ollama
+	•	Docker & Docker Compose
+	•	(Optional) NVIDIA GPU drivers + CUDA for GPU acceleration with Ollama
 
 2. Clone the repo
+
 git clone https://github.com/<your-username>/ai-platform-poc.git
 cd ai-platform-poc
+
+3. Configure environment
+
+Copy the example env file and adjust values:
+cp deploy/.env.example deploy/.env   
+
+Configure:
+	•	OLLAMA_BASE_URL
+	•	CHROMA_HOST / CHROMA_PORT
+	•	RAG_API_PORT
+	•	OPENWEBUI_PORT
+	•	Any auth/API keys if you add them later
+
+
+
+
+
+
