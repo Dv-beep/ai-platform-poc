@@ -1,4 +1,4 @@
-# AI Knowledge Platform – RAG Proof of Concept
+# AI Knowledge Platform – RAG
 
 This repository contains a self-hosted AI Knowledge Platform built around **Retrieval-Augmented Generation (RAG)**.
 
