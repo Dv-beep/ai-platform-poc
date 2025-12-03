@@ -32,8 +32,8 @@ The AI-POC pipeline retrieves relevant internal content and augments the LLM’s
         │                                                   │
         ▼                                                   ▼
 ┌──────────────────┐                              ┌──────────────────┐
-│    ChromaDB       │                              │     Ollama       │
-│ (Vector Store)    │                              │  (Local LLM)     │
+│    ChromaDB      │                              │     Ollama       │
+│ (Vector Store)   │                              │  (Local LLM)     │
 └──────────────────┘                              └──────────────────┘
 
                        ▼
@@ -144,7 +144,7 @@ If multiple systems will use the RAG pipeline (OpenWebUI, web portals, n8n, Slac
 
 ```
               ┌──────────────┐
-              │ API Gateway   │
+              │ API Gateway  │
               └───────┬──────┘
                       ▼
                  RAG API
