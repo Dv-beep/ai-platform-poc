@@ -1,6 +1,6 @@
 # **AI-POC: Retrieval-Augmented Generation (RAG) System**
 
-This project implements an on-premise Retrieval-Augmented Generation (RAG) pipeline for securely querying TLI internal knowledge bases (KBs/SOPs). All data, embeddings, and LLM inference remain fully inside the network—no cloud services or external APIs.
+This project implements an on-premise Retrieval-Augmented Generation (RAG) pipeline for securely querying an internal knowledge bases (KBs/SOPs). All data, embeddings, and LLM inference remain fully inside the network—no cloud services or external APIs.
 
 The system is built using OpenWebUI, a custom RAG API, ChromaDB, Ollama, and a document indexer, all running in an isolated containerized environment.
 
@@ -12,7 +12,7 @@ The AI-POC pipeline retrieves relevant internal content and augments the LLM’s
 
 ```
                     ┌─────────────────────────┐
-                    │       Users / IT        │
+                    │       Users             │
                     └────────────┬────────────┘
                                  │  HTTPS
                                  ▼
@@ -48,8 +48,8 @@ Internal KB & SOP directories on the Windows file server are mounted into the Li
 
 ```
 CIFS File Shares
-   ├── //rei.edu/.../IT/KB
-   └── //rei.edu/.../IT/SOP
+   ├── //domain.com/.../KB
+   └── //domaiin.com/.../SOP
             │
             ▼
      Linux Host Mounts
@@ -65,7 +65,7 @@ CIFS File Shares
             │
             ▼
      ChromaDB Collection
-          tli_kb
+          collection_name
 ```
 
 This ensures all documentation is searchable and query-ready.
@@ -76,7 +76,7 @@ This ensures all documentation is searchable and query-ready.
 
 1. **User asks a question** in OpenWebUI.
 2. OpenWebUI’s RAG tool sends the question → **RAG API**.
-3. RAG API queries **ChromaDB** (collection: `tli_kb`) to retrieve the top-K relevant chunks.
+3. RAG API queries **ChromaDB** (collection: `collection_name`) to retrieve the top-K relevant chunks.
 4. RAG API inserts those chunks into a structured prompt.
 5. RAG API sends the prompt to **Ollama**, which performs LLM inference on-prem.
 6. The LLM generates the final answer with context and citations.
@@ -90,7 +90,7 @@ All retrieval and inference operations occur internally.
 
 ### **1. OpenWebUI**
 
-* Main chat interface for IT and researchers
+* Main chat interface for users
 * Supports RAG tool integration
 * Hosted locally and isolated from external networks
 
@@ -106,7 +106,7 @@ All retrieval and inference operations occur internally.
 ### **3. ChromaDB**
 
 * Vector database storing embeddings
-* Collection: `tli_kb`
+* Collection: `collection_name`
 * Accessible only on internal Docker networks
 
 ### **4. Ollama**
