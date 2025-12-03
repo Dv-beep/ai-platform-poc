@@ -116,7 +116,7 @@ ai-poc/
 
 ```
 
-See [docs/arhitecture-overview.md](https://github.com/Dv-beep/ai-platform-poc/blob/main/docs/architecture-overview.md) for diagrams and more detail.
+See [docs/arhitecture-overview.md](https://github.com/Dv-beep/ai-platform-poc/blob/main/ai-poc/docs/architecture-overview.md) for diagrams and more detail.
 
 ---
 
