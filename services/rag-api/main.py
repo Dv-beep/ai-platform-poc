@@ -3,26 +3,44 @@ RAG API
 
 FastAPI service that fronts a ChromaDB collection. Provides:
 
-- /ingest: indexer pushes pre-chunked documents with doc_hash + last_modified
-- /query: clients request top-k relevant chunks for a natural language query
+- POST /ingest:
+    Indexer pushes pre-chunked documents with doc_hash + last_modified
+
+- POST /query:
+    Clients request top-k relevant chunks for a natural language query
+
+- GET /health:
+    Basic health check
+
+- GET /admin/status:
+    Admin-only status + document count + last indexer heartbeat
+
+- POST /admin/indexer_status:
+    Indexer sends status/heartbeat payload
+
+- POST /delete_document:
+    Admin-only delete by document_id (used by indexer)
 """
 
-
-
-from fastapi import FastAPI
-from pydantic import BaseModel, Field
+import os
 from typing import List, Dict, Any, Optional
+
 import chromadb
 from chromadb.config import Settings
-import os
+from fastapi import FastAPI, Header, HTTPException
+from pydantic import BaseModel, Field
 
-CHROMA_HOST = os.environ.get("CHROMA_HOST", "server")
+# --- Environment / config ---
+
+CHROMA_HOST = os.environ.get("CHROMA_HOST", "chromadb")
 CHROMA_PORT = int(os.environ.get("CHROMA_PORT", "8000"))
 COLLECTION_NAME = os.environ.get("COLLECTION_NAME", "tli_kb")
+ADMIN_API_KEY = os.environ.get("ADMIN_API_KEY")  # optional admin key
 
-app = FastAPI(title="TLI RAG API")
+app = FastAPI(title="RAG API")
 
 # --- Chroma client and collection ---
+
 client = chromadb.HttpClient(
     host=CHROMA_HOST,
     port=CHROMA_PORT,
@@ -30,8 +48,12 @@ client = chromadb.HttpClient(
 )
 collection = client.get_or_create_collection(COLLECTION_NAME)
 
+# In-memory store for latest indexer status heartbeat
+LAST_INDEXER_STATUS: Optional[Dict[str, Any]] = None
+
 
 # ---------- Pydantic models ----------
+
 class Chunk(BaseModel):
     id: str
     text: str
@@ -42,7 +64,7 @@ class IngestRequest(BaseModel):
     document_id: str
     chunks: List[Chunk]
 
-    # optional extras from the indexer
+    # Optional extras from the indexer
     doc_hash: Optional[str] = None          # sha256 or similar
     last_modified: Optional[str] = None     # ISO8601 string (e.g. 2025-12-01T21:30:00Z)
 
@@ -64,13 +86,38 @@ class QueryResponse(BaseModel):
     results: List[QueryResult]
 
 
+class DeleteDocumentRequest(BaseModel):
+    document_id: str
+
+
+class IndexerStatusPayload(BaseModel):
+    last_run: Optional[str] = None
+    last_error: Optional[str] = None
+    kb_roots: List[str] = Field(default_factory=list)
+    files_seen: int = 0
+    docs_indexed: int = 0
+    deleted_docs: int = 0
+
+
+# ---------- Helpers ----------
+
+def require_admin(x_admin_key: Optional[str]) -> None:
+    """
+    Simple admin-key check for admin endpoints.
+    If ADMIN_API_KEY is set, the header must match.
+    If ADMIN_API_KEY is not set, allow all (useful for local dev).
+    """
+    if ADMIN_API_KEY and x_admin_key != ADMIN_API_KEY:
+        raise HTTPException(status_code=401, detail="Invalid admin key")
+
+
 # ---------- Endpoints ----------
 
 @app.post("/ingest")
 def ingest(req: IngestRequest):
     """
     Ingest pre-chunked text into Chroma.
-    Indexer calls this – not WebUI.
+    Called by the indexer service, not end users.
     """
 
     if not req.chunks:
@@ -178,8 +225,72 @@ def query(req: QueryRequest):
     return QueryResponse(results=out)
 
 
+@app.post("/delete_document")
+def delete_document(
+    req: DeleteDocumentRequest,
+    x_admin_key: Optional[str] = Header(None, alias="X-Admin-Key"),
+):
+    """
+    Delete all chunks for a given document_id.
+    Used by the indexer when files are removed from disk.
+    """
+    require_admin(x_admin_key)
+
+    # Chroma's delete returns None, so we just acknowledge the request
+    collection.delete(where={"document_id": req.document_id})
+
+    return {
+        "status": "ok",
+        "deleted_document_id": req.document_id,
+    }
+
+
+@app.post("/admin/indexer_status")
+def admin_indexer_status(
+    status: IndexerStatusPayload,
+    x_admin_key: Optional[str] = Header(None, alias="X-Admin-Key"),
+):
+    """
+    Receive indexer heartbeat/status.
+    Called by the indexer at the end of a run.
+    """
+    require_admin(x_admin_key)
+
+    global LAST_INDEXER_STATUS
+    LAST_INDEXER_STATUS = status.dict()
+
+    return {"status": "ok"}
+
+
+@app.get("/admin/status")
+def admin_status(
+    x_admin_key: Optional[str] = Header(None, alias="X-Admin-Key"),
+):
+    """
+    Admin-only status & metadata endpoint.
+
+    Used by:
+    - indexer (to decide on reset/full rebuild via document_count)
+    - operators (health & last indexer status)
+    """
+    require_admin(x_admin_key)
+
+    try:
+        document_count = collection.count()
+    except Exception:
+        document_count = 0
+
+    return {
+        "status": "ok",
+        "collection": COLLECTION_NAME,
+        "document_count": document_count,
+        "indexer_status": LAST_INDEXER_STATUS,
+    }
+
+
 @app.get("/health")
 def health():
+    """
+    Basic health check endpoint.
+    """
     return {"status": "ok", "collection": COLLECTION_NAME}
-
-
