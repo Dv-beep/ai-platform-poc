@@ -23,7 +23,7 @@ It’s built for research institutes, IT departments, and enterprises that canno
 ## Architecture Diagram
 
 <p align="center">
-  <img src="[ai-platform-poc/docs/screenshots/architecture.png](https://github.com/Dv-beep/ai-platform-poc/blob/main/docs/screenshots/architecture.png)" width="700"/>
+  <img src="ai-platform-poc/docs/screenshots/architecture.png" width="700"/>
 </p>
 
 ---
