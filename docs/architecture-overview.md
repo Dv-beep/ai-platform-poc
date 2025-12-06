@@ -3,7 +3,7 @@
 The AI-POC pipeline retrieves relevant internal content and augments the LLM’s response using ChromaDB-stored KB/SOP embeddings.
 ```text
                     ┌─────────────────────────┐
-                    │       Users / IT        │
+                    │          Users          │
                     └────────────┬────────────┘
                                  │  HTTPS
                                  ▼
