@@ -214,4 +214,4 @@ Sends heartbeat data to `/admin/status` for observability.
 ---
 
 **See more details:**
-📄 [docs/architecture-overview.md](https://github.com/Dv-beep/ai-platform-poc/blob/main/ai-poc/docs/architecture-overview.md)
+📄 [docs/architecture-overview.md](https://github.com/Dv-beep/ai-platform-poc/blob/main/docs/architecture-overview.md)
